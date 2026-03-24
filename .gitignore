@@ -6,6 +6,16 @@ dist/
 wheels/
 *.egg-info
 
+
+.uv
+
 # Virtual environments
 .idea
 .venv
+
+
+docker-compose.override.yml
+.docker/
+
+# Generated files
+src/protos/generated/

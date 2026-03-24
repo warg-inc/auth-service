@@ -1,14 +1,14 @@
-from src.setup.app_factory import create_web_app
+import asyncio
+from setup.app_factory import AppFactory
+
+
+async def main():
+    grpc_server = AppFactory.create_grpc_server()
+
+    await grpc_server.start()
+
+    await asyncio.Event().wait()
 
 
 if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(
-        "src.setup.app_factory:create_web_app",
-        factory=True,
-        host="0.0.0.0",
-        port=8001,
-        reload=True,
-        reload_dirs=["src"],
-    )
+    asyncio.run(main())
