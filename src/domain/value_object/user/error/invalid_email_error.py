@@ -1,0 +1,6 @@
+
+
+
+
+class InvalidEmailError(ValueError):
+    pass
