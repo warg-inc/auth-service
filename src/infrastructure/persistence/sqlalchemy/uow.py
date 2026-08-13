@@ -1,17 +1,18 @@
+from __future__ import annotations
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from src.infrastructure.persistence.repositories.jwt_token_sqlalchemy_repository import JWTTokenSqlalchemyRepository
 from src.infrastructure.persistence.repositories.user_repository import UserSqlalchemyRepository
+from src.application.ports.uow_interface import UnitOfWork, UnitOfWorkFactory
 
-
-class UnitOfWork:
+class SqlAlchemyUnitOfWork(UnitOfWork):
     def __init__(self, session_factory: async_sessionmaker[AsyncSession]):
         self.session_factory = session_factory
         self._session: AsyncSession | None = None
         self._users: UserSqlalchemyRepository | None = None
         self._tokens: JWTTokenSqlalchemyRepository | None = None
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> SqlAlchemyUnitOfWork:
         self._session = self.session_factory()
         return self
 
@@ -51,9 +52,9 @@ class UnitOfWork:
         return self._users
 
 
-class UnitOfWorkFactory:
+class SqlAlchemyUnitOfWorkFactory(UnitOfWorkFactory):
     def __init__(self, session_factory):
         self.session_factory = session_factory
 
     def __call__(self):
-        return UnitOfWork(self.session_factory)
+        return SqlAlchemyUnitOfWork(self.session_factory)
