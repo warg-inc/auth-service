@@ -1,5 +1,5 @@
 import asyncio
-from setup.app_factory import AppFactory
+from src.setup.app_factory import AppFactory
 
 
 async def main():
