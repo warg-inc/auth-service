@@ -9,3 +9,7 @@ class UserError(Exception):
 class UserAlreadyExistsError(UserError):
     def __init__(self):
         super().__init__(message="User Already Exists", code="user_exists")
+
+class InvalidCredentialsError(UserError):
+    def __init__(self, message = "Invalid Credentials Error", code = "invalid_credentials"):
+        super().__init__(message, code)

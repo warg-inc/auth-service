@@ -5,7 +5,7 @@ from src.domain.value_object.user.password import Password
 
 class PasswordHasher(ABC):
     @abstractmethod
-    def hash(self, password: str) -> str:
+    def hash(self, password: Password) -> str:
         raise NotImplementedError
     
     @abstractmethod

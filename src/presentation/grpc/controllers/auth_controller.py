@@ -2,17 +2,23 @@ import grpc
 import traceback
 
 from src.application.exceptions.user_exceptions import UserAlreadyExistsError
+from src.application.exceptions.user_exceptions import InvalidCredentialsError
+
 from src.application.use_cases.create_user import CreateUserUseCase
+from src.application.use_cases.login_user import LoginUserUseCase
+
 from src.domain.value_object.user.email import Email
 from src.domain.value_object.user.password import Password
+from src.application.dto.tokens import TokensDTO
 from src.domain.value_object.user.error.invalid_email_error import InvalidEmailError
 from src.domain.value_object.user.error.invalid_password_error import InvalidPasswordError
 from src.protos.generated import auth_pb2_grpc, auth_pb2
 
 
 class AuthController(auth_pb2_grpc.AuthServiceServicer):
-    def __init__(self, register_user: CreateUserUseCase):
+    def __init__(self, register_user: CreateUserUseCase, login_user: LoginUserUseCase):
         self.register_user = register_user
+        self.login_user = login_user
 
     async def RegisterUser(self, request: auth_pb2.RegisterRequest, context) -> auth_pb2.RegisterResponse:
         try:
@@ -37,7 +43,39 @@ class AuthController(auth_pb2_grpc.AuthServiceServicer):
                 str(e)
             )
 
-        except Exception as e:
+        except Exception:
+            traceback.print_exc()
+
+            await context.abort(
+                grpc.StatusCode.INTERNAL,
+                "Internal server error"
+            )
+
+    async def LoginUser(self, request: auth_pb2.LoginRequest, context) -> auth_pb2.LoginResponse:
+        try:
+            tokens: TokensDTO = await self.login_user(
+                email=Email(request.email),
+                password=Password(request.password)
+            )
+
+            return auth_pb2.LoginResponse(
+                access_token=tokens.access_token,
+                refresh_token=tokens.refresh_token
+            )
+
+        except InvalidCredentialsError:
+            await context.abort(
+                grpc.StatusCode.UNAUTHENTICATED,
+                "Invalid credentials"
+            )
+
+        except (InvalidEmailError, InvalidPasswordError):
+            await context.abort(
+                grpc.StatusCode.UNAUTHENTICATED,
+                "Invalid credentials"
+            )
+
+        except Exception:
             traceback.print_exc()
 
             await context.abort(

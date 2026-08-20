@@ -1,5 +1,5 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 import uuid
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.application.dto.token_payload import TokenPayloadDTO
 from src.application.ports.token_persistence import TokenPersistence
@@ -10,7 +10,7 @@ class JWTTokenSqlalchemyRepository(TokenPersistence):
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    def save(self, dto: TokenPayloadDTO) -> None:
+    async def save(self, dto: TokenPayloadDTO) -> None:
         refresh_tokens = RefreshTokens(
             jti=uuid.UUID(dto.jti),
             user_id=int(dto.sub),
@@ -20,5 +20,4 @@ class JWTTokenSqlalchemyRepository(TokenPersistence):
         )
 
         self.session.add(refresh_tokens)
-        self.session.refresh(refresh_tokens)
-
+        await self.session.flush()
