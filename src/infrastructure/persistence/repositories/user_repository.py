@@ -26,7 +26,7 @@ class UserSqlalchemyRepository(UserRepository):
         if user is None:
             return None
 
-        return User(email=Email(user.email), surname=user.surname, name=user.name, password=None)
+        return User(email=Email(user.email), surname=user.surname, name=user.name, hashed_password=user.hashed_password, id=user.id)
 
     async def get_by_email(self, email: Email) -> Optional[User]:
         result = await self.session.execute(
@@ -39,7 +39,7 @@ class UserSqlalchemyRepository(UserRepository):
         if user is None:
             return None
 
-        return User(email=Email(user.email), surname=user.surname, name=user.name, hashed_password=user.hashed_password)
+        return User(email=Email(user.email), surname=user.surname, name=user.name, hashed_password=user.hashed_password, id=user.id)
 
     async def add(self, data: User) -> None:
         provider = "fitapp"

@@ -1,7 +1,5 @@
-import uuid
-from datetime import datetime, timezone, timedelta
-
 import jwt
+from datetime import datetime, timezone
 
 from src.application.dto.token_payload import TokenPayloadDTO
 from src.application.dto.tokens import TokensDTO

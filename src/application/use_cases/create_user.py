@@ -18,7 +18,7 @@ class CreateUserUseCase:
             if await uow.users.exists_by_email(email):
                 raise UserAlreadyExistsError()
 
-            hashed = self.hasher.hash(password.value)
+            hashed = self.hasher.hash(password)
 
             user = User(
                 email=email,

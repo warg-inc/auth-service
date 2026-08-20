@@ -1,20 +1,17 @@
 import uuid
 from datetime import datetime, timezone, timedelta
 
-from jwt import jwt
-
 from src.application.dto.token_payload import TokenPayloadDTO
-from src.application.dto.tokens import TokensDTO
-from src.application.ports.token_persistence import TokenPersistence
+from src.application.dto.issued_tokens import IssuedTokensDTO 
+from src.application.dto.tokens import TokensDTO 
 from src.application.ports.token_provider import TokenProvider
 
 
 class TokenService:
-    def __init__(self, token_provider: TokenProvider, token_persistence: TokenPersistence):
+    def __init__(self, token_provider: TokenProvider):
         self.token_provider = token_provider
-        self.token_persistence = token_persistence
 
-    def create_tokens(self, user_id: str):
+    def create_tokens(self, user_id: str) -> IssuedTokensDTO:
 
         now = datetime.now(timezone.utc)
         jti_access = str(uuid.uuid4())
@@ -39,6 +36,7 @@ class TokenService:
 
         tokens: TokensDTO = self.token_provider.create(dto_access, dto_refresh)
 
-        self.token_persistence.save()
-
-
+        return IssuedTokensDTO(
+            tokens=tokens,
+            refresh_payload=dto_refresh,
+        )
